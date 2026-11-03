@@ -1,26 +1,5 @@
-// =====================================================================
-// EXERCISE — Bookmarks store (Zustand + Immer)
-//
-// Goal: Build a Zustand store that holds a list of bookmarks and can add,
-// favorite and remove them — using Immer so you can "mutate" the draft.
-//
-// Success criteria:
-//   [ ] Store holds an array of bookmarks
-//   [ ] `add` appends a new bookmark with a generated id
-//   [ ] `toggleFavorite` flips `isFavorite` on one bookmark only
-//   [ ] `remove` deletes a bookmark by id
-//   [ ] No `useState` for the list — the store is the single source of truth
-//
-// 💡 Middleware needs the extra `()`:
-//    create<BookmarksStore>()(immer((set) => ({ ... })))
-//
-// Navigator's reading:
-//   https://zustand.docs.pmnd.rs/integrations/immer-middleware
-// =====================================================================
-
 import { create } from "zustand";
-// TODO(step 1): import the Immer middleware
-// import { immer } from "zustand/middleware/immer";
+import { immer } from "zustand/middleware/immer";
 
 export interface Bookmark {
 	id: string;
@@ -35,28 +14,48 @@ interface BookmarksStore {
 	toggleFavorite: (id: string) => void;
 	remove: (id: string) => void;
 }
+// create crea el store de Zustand.
+// immer permite trabajar con un borrador del estado:
+// escribimos cambios sencillos e Immer produce el nuevo estado.
+export const useBookmarksStore = create<BookmarksStore>()(
+	immer((set) => ({
+		// Lista vacía al comenzar.
+		bookmarks: [],
 
-// TODO(step 1): wrap this initializer in the `immer` middleware, then fill in
-// the three actions below.
-//
-// TODO(step 2): `add` — push a new bookmark. Use crypto.randomUUID() for the
-//               id and start with isFavorite: false.
-// TODO(step 3): `toggleFavorite` — find the bookmark by id and flip its
-//               isFavorite. Only that one should change.
-// TODO(step 4): `remove` — filter the bookmark out by id.
-export const useBookmarksStore = create<BookmarksStore>()((set) => ({
-	bookmarks: [],
+		// Recibe un objeto con el título y la dirección del enlace.
+		add: ({ title, url }) =>
+			// set actualiza el store.
+			// Gracias a Immer, state es un borrador que podemos modificar.
+			set((state) => {
+				// push agrega un elemento al final de la lista.
+				state.bookmarks.push({
+					id: crypto.randomUUID(), // Genera un identificador único.
+					title: title, // Guarda el título recibido.
+					url: url, // Guarda la dirección recibida.
+					isFavorite: false, // Comienza sin marcar como favorito.
+				});
+			}),
 
-	add: ({ title, url }) => {
-		// Remove this line once you implement the action.
-		console.warn("add() not implemented", { title, url }, set);
-	},
+		// Recibe el identificador del bookmark que queremos cambiar.
+		toggleFavorite: (id) =>
+			set((state) => {
+				// find busca en la lista y devuelve el primer elemento que coincide.
+				// b representa cada bookmark que revisamos.
+				const bookmark = state.bookmarks.find((b) => b.id === id);
 
-	toggleFavorite: (id) => {
-		console.warn("toggleFavorite() not implemented", id);
-	},
+				// Si encontramos el bookmark, invertimos su valor de favorito.
+				if (bookmark) {
+					bookmark.isFavorite = !bookmark.isFavorite;
+				}
+			}),
 
-	remove: (id) => {
-		console.warn("remove() not implemented", id);
-	},
-}));
+		// Recibe el identificador del bookmark que queremos eliminar.
+		remove: (id) =>
+			set((state) => {
+				// filter crea una lista con los bookmarks que queremos conservar.
+				// !== significa "es diferente de".
+				// Conservamos todos excepto el que tiene el id recibido.
+				state.bookmarks = state.bookmarks.filter((b) => b.id !== id);
+			}),
+	})),
+);

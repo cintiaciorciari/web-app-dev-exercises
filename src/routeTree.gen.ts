@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExampleIndexRouteImport } from './routes/example/index'
+import { Route as TodoIndexRouteImport } from './routes/todo/index'
 import { Route as ExerciseBookmarksIndexRouteImport } from './routes/exercise/bookmarks/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const ExampleIndexRoute = ExampleIndexRouteImport.update({
   path: '/example/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TodoIndexRoute = TodoIndexRouteImport.update({
+  id: '/todo/',
+  path: '/todo/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExerciseBookmarksIndexRoute = ExerciseBookmarksIndexRouteImport.update({
   id: '/exercise/bookmarks/',
   path: '/exercise/bookmarks/',
@@ -32,30 +38,34 @@ const ExerciseBookmarksIndexRoute = ExerciseBookmarksIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/example/': typeof ExampleIndexRoute
+  '/todo/': typeof TodoIndexRoute
   '/exercise/bookmarks/': typeof ExerciseBookmarksIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/example': typeof ExampleIndexRoute
+  '/todo': typeof TodoIndexRoute
   '/exercise/bookmarks': typeof ExerciseBookmarksIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/example/': typeof ExampleIndexRoute
+  '/todo/': typeof TodoIndexRoute
   '/exercise/bookmarks/': typeof ExerciseBookmarksIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/example/' | '/exercise/bookmarks/'
+  fullPaths: '/' | '/example/' | '/todo/' | '/exercise/bookmarks/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/example' | '/exercise/bookmarks'
-  id: '__root__' | '/' | '/example/' | '/exercise/bookmarks/'
+  to: '/' | '/example' | '/todo' | '/exercise/bookmarks'
+  id: '__root__' | '/' | '/example/' | '/todo/' | '/exercise/bookmarks/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ExampleIndexRoute: typeof ExampleIndexRoute
+  TodoIndexRoute: typeof TodoIndexRoute
   ExerciseBookmarksIndexRoute: typeof ExerciseBookmarksIndexRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExampleIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/todo/': {
+      id: '/todo/'
+      path: '/todo'
+      fullPath: '/todo/'
+      preLoaderRoute: typeof TodoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/exercise/bookmarks/': {
       id: '/exercise/bookmarks/'
       path: '/exercise/bookmarks'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ExampleIndexRoute: ExampleIndexRoute,
+  TodoIndexRoute: TodoIndexRoute,
   ExerciseBookmarksIndexRoute: ExerciseBookmarksIndexRoute,
 }
 export const routeTree = rootRouteImport
